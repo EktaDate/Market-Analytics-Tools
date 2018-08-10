@@ -15,7 +15,7 @@ namespace MarketSummaryConsole
         static void Main()
         {
             Console.OutputEncoding = Encoding.UTF8;
-            CosmosRepository<ProspectData>.Initialize();
+            //CosmosRepository<ProspectData>.Initialize();
             
             Console.WriteLine("Searching the Web for: " + "Prospects");
             ProcessData.ProcessBingSearchData().Wait();

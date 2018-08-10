@@ -8,7 +8,10 @@ using System.Threading.Tasks;
 namespace MarketSummaryConsole
 {
     public class ProspectData
-    {                              
+    {
+        [JsonProperty(PropertyName = "id")]
+        public string Id { get; set; }
+
         [JsonProperty(PropertyName = "prospectname")]
         public string ProspectName { get; set; }
 

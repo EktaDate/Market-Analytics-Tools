@@ -12,7 +12,12 @@ namespace MarketSummaryConsole
         public static async Task ProcessBingSearchData()
         {
          
-            IEnumerable<ProspectDataSearchCriteria> searchCriterias = await CosmosRepository<ProspectDataSearchCriteria>.GetAllProspectsDataAsync(p => p.BingSearchUpdates == true);
+            //IEnumerable<ProspectDataSearchCriteria> searchCriterias = await CosmosRepository<ProspectDataSearchCriteria>.GetAllProspectsDataAsync(p => p.BingSearchUpdates == true);
+
+            SQLRepository sqlDataAccess = new SQLRepository();
+            string WhereClause = " Where BingSearchUpdates = 'true'";
+
+            IEnumerable<ProspectDataSearchCriteria> searchCriterias  = sqlDataAccess.GetProspectData(WhereClause);
             foreach (ProspectDataSearchCriteria searchCriteria in searchCriterias)
             {
                 string searchString = searchCriteria.ProspectName + " + " + searchCriteria.SearchString;
@@ -45,7 +50,9 @@ namespace MarketSummaryConsole
                 BingSearchUpdates = true
             };
 
-            await CosmosRepository<ProspectData>.CreateSearchDataAsync(searchProspectData);
+            //await CosmosRepository<ProspectData>.CreateSearchDataAsync(searchProspectData);
+            SQLRepository sqlDataAccess = new SQLRepository();
+            sqlDataAccess.InsertProspectData(searchProspectData);
         }
     }
 }
