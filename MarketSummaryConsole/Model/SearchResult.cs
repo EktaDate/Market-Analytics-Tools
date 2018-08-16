@@ -15,5 +15,6 @@ namespace MarketSummaryConsole
     public class ExtractedBingSearchData
     {
         public string url;
+        public string dateLastCrawled;
     }
 }

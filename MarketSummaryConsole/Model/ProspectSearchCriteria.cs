@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace MarketSummaryConsole
 {
-    public class ProspectDataSearchCriteria
+    public class ProspectSearchCriteria
     {
         [JsonProperty(PropertyName = "id")]
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         [JsonProperty(PropertyName = "prospectname")]
 

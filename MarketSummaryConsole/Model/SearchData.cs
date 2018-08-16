@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MarketSummaryConsole
 {
-    public class ProspectData
+    public class ProspectSummaryData
     {
         [JsonProperty(PropertyName = "id")]
         public string Id { get; set; }
@@ -36,6 +36,12 @@ namespace MarketSummaryConsole
 
         [JsonProperty(PropertyName = "bingsearchupdates")]        
         public bool BingSearchUpdates { get; set; }
+
+        [JsonProperty(PropertyName = "isprocessed")]
+        public bool IsProcessed { get; set; }
+
+        [JsonProperty(PropertyName = "dataprocesseddate")]
+        public DateTime? DataProcessedDate { get; set; }
 
 
     }

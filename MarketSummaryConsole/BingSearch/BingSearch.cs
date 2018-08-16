@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -10,19 +11,21 @@ using System.Threading.Tasks;
 namespace MarketSummaryConsole
 {
     public static class BingSearch
-    {       
-        const string congnitiveaccessKey = "0f77b6255ee5492294e06f2f2afbacb8";     
-        const string uriBase = "https://api.cognitive.microsoft.com/bing/v7.0/search";
-
+    {
+        static readonly string congnitiveaccessKey = ConfigurationManager.AppSettings["congnitiveaccessKey"];
+        static readonly string uriBase = ConfigurationManager.AppSettings["bingsearchuri"];
+        static readonly string recordCount = ConfigurationManager.AppSettings["bingurlcount"];
+        static readonly string ageOfdataInMonths = ConfigurationManager.AppSettings["bingsearchageofdata"];
 
         /// <summary>
         /// Performs a Bing Web search and return the results as a SearchResult.
         /// </summary>
-        public static BingSearchResult WebSearch(string searchQuery,string recordCount,string ageOfData)
+        public static BingSearchResult WebSearch(string searchQuery)
         {   
             if (congnitiveaccessKey.Length == 32)
-            {               
-                var uriQuery = uriBase + "?q=" + Uri.EscapeDataString(searchQuery) + "&count=" + recordCount + "&freshness="+ ageOfData;
+            {                
+                string ageOfData = DateTime.Now.AddMonths(-int.Parse(ageOfdataInMonths)).ToString("yyyy-MM-dd") +".."+ DateTime.Now.ToString("yyyy-MM-dd"); 
+                var uriQuery = uriBase + "?q=" + Uri.EscapeDataString(searchQuery) + "&count=" + recordCount + "&freshness=" + ageOfData;
                 WebRequest request = HttpWebRequest.Create(uriQuery);
 
                 request.Headers["Ocp-Apim-Subscription-Key"] = congnitiveaccessKey;

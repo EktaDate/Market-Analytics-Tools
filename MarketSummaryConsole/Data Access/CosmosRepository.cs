@@ -10,7 +10,7 @@ using System.Linq.Expressions;
 
 namespace MarketSummaryConsole
 {
-    public static class CosmosRepository<T> where T : class
+    public class CosmosRepository<T> : IDBRepository<T> where T : class
     {
         private static readonly string DatabaseId = ConfigurationManager.AppSettings["database"];
         private static readonly string CollectionId = ConfigurationManager.AppSettings["collection"];
@@ -23,12 +23,7 @@ namespace MarketSummaryConsole
             CreateDatabaseIfNotExistsAsync().Wait();
             CreateCollectionIfNotExistsAsync().Wait();
         }
-
-
-        /// <summary>
-        /// Create Database for MarketData and Search Data collection
-        /// </summary>
-        /// <returns></returns>
+        
         private static async Task CreateDatabaseIfNotExistsAsync()
         {
             try
@@ -68,19 +63,23 @@ namespace MarketSummaryConsole
             }
         }
 
-        public static async Task<Document> CreateSearchDataAsync(T SearchData)
+        public async Task<bool> CreateDataAsync(T data)
         {
 
-            return await client.CreateDocumentAsync(UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId), SearchData);                        
+            Document doc = await client.CreateDocumentAsync(UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId), data);                        
+            if(doc == null)
+            {
+                return false;
+            }
+            return true;
         }
 
-
-        public static async Task<IEnumerable<T>> GetAllProspectsDataAsync(Expression<Func<ProspectDataSearchCriteria, bool>> predicate)
+        public async Task<IEnumerable<T>> GetProspectsAsync(Expression<Func<T, bool>> predicate)
         {
             try
             {
                 Initialize();
-                IDocumentQuery<ProspectDataSearchCriteria> query = client.CreateDocumentQuery<ProspectDataSearchCriteria>(UriFactory.CreateDocumentCollectionUri(DatabaseId, SearchCollectionId),
+                IDocumentQuery<T> query = client.CreateDocumentQuery<T>(UriFactory.CreateDocumentCollectionUri(DatabaseId, SearchCollectionId),
                 new FeedOptions { MaxItemCount = -1, EnableCrossPartitionQuery = true })
                 .Where(predicate)                
                 .AsDocumentQuery();

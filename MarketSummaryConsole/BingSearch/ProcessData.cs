@@ -3,56 +3,54 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace MarketSummaryConsole
 {
-    public static class ProcessData
-    {
+    public class ProcessData
+    {        
+        public async Task ProcessBingSearchData()
+        {                       
+            IDataAccess dataAccess = DataAccess.GetInstance();
+            Expression<Func<ProspectSearchCriteria, bool>> predicate = (p => p.BingSearchUpdates == true);                                                                               
+            IEnumerable<ProspectSearchCriteria> searchCriteriaList = await dataAccess.GetProspectSearchCriteriaAsync(predicate);
 
-        public static async Task ProcessBingSearchData()
-        {
-         
-            //IEnumerable<ProspectDataSearchCriteria> searchCriterias = await CosmosRepository<ProspectDataSearchCriteria>.GetAllProspectsDataAsync(p => p.BingSearchUpdates == true);
-
-            SQLRepository sqlDataAccess = new SQLRepository();
-            string WhereClause = " Where BingSearchUpdates = 'true'";
-
-            IEnumerable<ProspectDataSearchCriteria> searchCriterias  = sqlDataAccess.GetProspectData(WhereClause);
-            foreach (ProspectDataSearchCriteria searchCriteria in searchCriterias)
+            foreach (ProspectSearchCriteria searchCriteria in searchCriteriaList)
             {
                 string searchString = searchCriteria.ProspectName + " + " + searchCriteria.SearchString;
-                BingSearchResult searchResult = BingSearch.WebSearch(searchString, "20","Month");                
-                InsertBingDataAsync(searchResult, searchCriteria).Wait();
+                BingSearchResult searchResult = BingSearch.WebSearch(searchString);                
+                InsertBingDataAsync(searchResult.jsonResult, searchCriteria.ProspectName, searchCriteria.SearchString).Wait();                
             }                      
         }
-
-        public static async Task InsertBingDataAsync(BingSearchResult searchResults, ProspectDataSearchCriteria prospectSearchCriteria)
+        
+        private async Task InsertBingDataAsync(string bingSearchJsonResult,string prospectName, string searchString)
         {
           
-            var allSearchResults = JObject.Parse(searchResults.jsonResult);                                                 
+            var allSearchResults = JObject.Parse(bingSearchJsonResult);                                                 
             List<ExtractedBingSearchData> searchResultList = new List<ExtractedBingSearchData>();
             ExtractedBingSearchData searchData = null;
 
             foreach (var searchResult in allSearchResults["webPages"]["value"])
             {
                 searchData = new ExtractedBingSearchData();
-                searchData.url = Convert.ToString(searchResult["url"]);
-                searchResultList.Add(searchData);
+                searchData.url = Convert.ToString(searchResult["url"]);                
+                searchData.dateLastCrawled = Convert.ToDateTime(searchResult["dateLastCrawled"]).ToString("dd-MM-yyyy");
+                searchResultList.Add(searchData);                
             }
 
             string jsonUrlString = JsonConvert.SerializeObject(searchResultList);
 
-            ProspectData searchProspectData = new ProspectData
+            ProspectSummaryData prospectSummaryData = new ProspectSummaryData
             {
-                ProspectName = prospectSearchCriteria.ProspectName,
+                ProspectName = prospectName,
                 SearchResult = jsonUrlString,
-                SearchString = prospectSearchCriteria.ProspectName + " + " + prospectSearchCriteria.SearchString,
-                BingSearchUpdates = true
+                SearchString = prospectName + " + " + searchString,
+                BingSearchUpdates = true,
+                DataProcessedDate = null
             };
-
-            //await CosmosRepository<ProspectData>.CreateSearchDataAsync(searchProspectData);
-            SQLRepository sqlDataAccess = new SQLRepository();
-            sqlDataAccess.InsertProspectData(searchProspectData);
+            IDataAccess dataAccess = DataAccess.GetInstance();
+            await dataAccess.InsertProspectData(prospectSummaryData);
         }
     }
 }
