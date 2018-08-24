@@ -24,10 +24,10 @@ namespace MarketSummaryConsole
             return instance;
         }
 
-        public async Task<IEnumerable<ProspectSearchCriteria>> GetProspectSearchCriteriaAsync(Expression<Func<ProspectSearchCriteria, bool>> predicate)
+        public async Task<IEnumerable<ProspectSearchCriteria>> GetProspectSearchCriteriaAsync()
         {
-            IDBRepository<ProspectSearchCriteria> dbObejct = FactoryClass<ProspectSearchCriteria>.CreateDBRepositoryObject();
-            IEnumerable<ProspectSearchCriteria> prospectSearchCriteriaList = await dbObejct.GetProspectsAsync(predicate);
+            IDBRepository dbObejct = FactoryClass.CreateDBRepositoryObject();
+            IEnumerable<ProspectSearchCriteria> prospectSearchCriteriaList = await dbObejct.GetProspectSearchCriteriaAsync();
             return prospectSearchCriteriaList;
         }
        
@@ -35,8 +35,8 @@ namespace MarketSummaryConsole
         {
             try
             {
-                IDBRepository<ProspectSummaryData> dbObejct = FactoryClass<ProspectSummaryData>.CreateDBRepositoryObject();
-                return await dbObejct.CreateDataAsync(prospectSummary);
+                IDBRepository dbObejct = FactoryClass.CreateDBRepositoryObject();
+                return await dbObejct.CreateProspectDataAsync(prospectSummary);
             }
             catch
             {

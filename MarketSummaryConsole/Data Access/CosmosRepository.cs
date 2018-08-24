@@ -10,7 +10,7 @@ using System.Linq.Expressions;
 
 namespace MarketSummaryConsole
 {
-    public class CosmosRepository<T> : IDBRepository<T> where T : class
+    public class CosmosRepository : IDBRepository
     {
         private static readonly string DatabaseId = ConfigurationManager.AppSettings["database"];
         private static readonly string CollectionId = ConfigurationManager.AppSettings["collection"];
@@ -63,10 +63,10 @@ namespace MarketSummaryConsole
             }
         }
 
-        public async Task<bool> CreateDataAsync(T data)
+        public async Task<bool> CreateProspectDataAsync(ProspectSummaryData prospectSummaryData)
         {
 
-            Document doc = await client.CreateDocumentAsync(UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId), data);                        
+            Document doc = await client.CreateDocumentAsync(UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId), prospectSummaryData);                        
             if(doc == null)
             {
                 return false;
@@ -74,20 +74,20 @@ namespace MarketSummaryConsole
             return true;
         }
 
-        public async Task<IEnumerable<T>> GetProspectsAsync(Expression<Func<T, bool>> predicate)
+        public async Task<IEnumerable<ProspectSearchCriteria>> GetProspectSearchCriteriaAsync()
         {
             try
             {
                 Initialize();
-                IDocumentQuery<T> query = client.CreateDocumentQuery<T>(UriFactory.CreateDocumentCollectionUri(DatabaseId, SearchCollectionId),
+                IDocumentQuery<ProspectSearchCriteria> query = client.CreateDocumentQuery<ProspectSearchCriteria>(UriFactory.CreateDocumentCollectionUri(DatabaseId, SearchCollectionId),
                 new FeedOptions { MaxItemCount = -1, EnableCrossPartitionQuery = true })
-                .Where(predicate)                
+                .Where(p=>p.BingSearchUpdates == true)                
                 .AsDocumentQuery();
 
-                List<T> results = new List<T>();
+                List<ProspectSearchCriteria> results = new List<ProspectSearchCriteria>();
                 while (query.HasMoreResults)
                 {
-                    results.AddRange(await query.ExecuteNextAsync<T>());
+                    results.AddRange(await query.ExecuteNextAsync<ProspectSearchCriteria>());
                 }
 
                 return results;

@@ -12,16 +12,22 @@ namespace MarketSummaryConsole
 
     public class Program
     {
-        static void Main()
+        static void Main(string[] args)
         {
-            Console.OutputEncoding = Encoding.UTF8;
+            //Console.OutputEncoding = Encoding.UTF8;
             //CosmosRepository<ProspectData>.Initialize();
             AutoMapper.Mapper.Initialize(cfg => cfg.AddProfile<AutoMapperProfile>());
 
             Console.WriteLine("Searching the Web for: " + "Prospects");
             ProcessData processdata = new ProcessData();
-            processdata.ProcessBingSearchData().Wait();
-
+            //processdata.ProcessBingSearchData().Wait();
+            if (args != null && args.Length > 0)
+            {
+                if (Convert.ToString(args[0]).ToUpper() == "BINGSEARCH")
+                {
+                    processdata.ProcessBingSearchData().Wait();
+                }
+            }
             Console.Write("\nPress Enter to exit ");
             Console.ReadLine();
 

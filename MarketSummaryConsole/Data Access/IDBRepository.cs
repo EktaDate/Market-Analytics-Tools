@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 
 namespace MarketSummaryConsole
 {
-    public interface IDBRepository<T> where T: class
+    public interface IDBRepository
     {
-        Task<IEnumerable<T>> GetProspectsAsync(Expression<Func<T, bool>> predicate);
+        Task<IEnumerable<ProspectSearchCriteria>> GetProspectSearchCriteriaAsync();
+
+        Task<bool> CreateProspectDataAsync(ProspectSummaryData prospectData);
         
-        Task<bool> CreateDataAsync(T data);       
     }
 }

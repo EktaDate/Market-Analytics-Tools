@@ -9,7 +9,7 @@ namespace MarketSummaryConsole
 {
     interface IDataAccess
     {                
-        Task<IEnumerable<ProspectSearchCriteria>> GetProspectSearchCriteriaAsync(Expression<Func<ProspectSearchCriteria, bool>> predicate);
+        Task<IEnumerable<ProspectSearchCriteria>> GetProspectSearchCriteriaAsync();
 
         Task<bool> InsertProspectData(ProspectSummaryData prospectSummary);
     }

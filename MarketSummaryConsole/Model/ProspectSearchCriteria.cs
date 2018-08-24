@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.WindowsAzure.Storage.Table;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,9 +9,10 @@ using System.Threading.Tasks;
 
 namespace MarketSummaryConsole
 {
-    public class ProspectSearchCriteria
+    public class ProspectSearchCriteria : TableEntity
     {
         [JsonProperty(PropertyName = "id")]
+        [IgnoreProperty]
         public int Id { get; set; }
 
         [JsonProperty(PropertyName = "prospectname")]

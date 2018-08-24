@@ -6,7 +6,7 @@ using System.Web;
 
 namespace MarketSummaryConsole
 {
-    public static class FactoryClass<T> where T : class
+    public static class FactoryClass
     {
         static DBType dbType = setDBType();
 
@@ -17,21 +17,30 @@ namespace MarketSummaryConsole
             {
                 return DBType.COSMOSDB;
             }
+            else if (dbtype == DBType.TABLESTORAGE.ToString())
+            {
+                return DBType.TABLESTORAGE;
+            }
             return DBType.AZURESQL;
         }
-        public static IDBRepository<T> CreateDBRepositoryObject()
+        public static IDBRepository CreateDBRepositoryObject()
         {
-            IDBRepository<T> objDBType = null;            
+            IDBRepository objDBType = null;
             switch (dbType)
             {
                 case DBType.AZURESQL:
 
-                    objDBType = new SQLRepository<T>();
+                    objDBType = new SQLRepository();
                     return objDBType;
 
                 case DBType.COSMOSDB:
 
-                    objDBType = new CosmosRepository<T>();
+                    objDBType = new CosmosRepository();
+                    return objDBType;
+
+                case DBType.TABLESTORAGE:
+
+                    objDBType = new TableStorageRepository();
                     return objDBType;
 
                 default:
@@ -39,12 +48,13 @@ namespace MarketSummaryConsole
 
             }
         }
-        
+
 
     }
     public enum DBType
     {
         AZURESQL,
-        COSMOSDB
+        COSMOSDB,
+        TABLESTORAGE
     }
 }

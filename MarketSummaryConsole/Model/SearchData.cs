@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.WindowsAzure.Storage.Table;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,9 +8,10 @@ using System.Threading.Tasks;
 
 namespace MarketSummaryConsole
 {
-    public class ProspectSummaryData
+    public class ProspectSummaryData :TableEntity
     {
         [JsonProperty(PropertyName = "id")]
+        [IgnoreProperty]
         public string Id { get; set; }
 
         [JsonProperty(PropertyName = "prospectname")]

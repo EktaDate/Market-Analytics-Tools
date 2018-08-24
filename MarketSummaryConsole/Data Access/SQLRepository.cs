@@ -17,23 +17,23 @@ using System.Linq;
 
 namespace MarketSummaryConsole
 {
-    public class SQLRepository<T> : IDBRepository<T> where T : class
+    public class SQLRepository : IDBRepository
     {
         ProspectDBContext prospectDBContext = new ProspectDBContext();
 
-        public async Task<IEnumerable<T>> GetProspectsAsync(Expression<Func<T, bool>> predicate)
+        public async Task<IEnumerable<ProspectSearchCriteria>> GetProspectSearchCriteriaAsync()
         {
-            IEnumerable<ProspectDataSearchCriteria> prospectDataSearchCriteria = await prospectDBContext.ProspectDataSearchCriterias.ToListAsync<ProspectDataSearchCriteria>();
-            IEnumerable<T> prospectSearchCriteriaList = Mapper.Map<IEnumerable<ProspectDataSearchCriteria>, IEnumerable<T>>(prospectDataSearchCriteria);
-            return prospectSearchCriteriaList.AsQueryable().Where(predicate);
 
-        }
-        
-        public async Task<bool> CreateDataAsync(T data)
+            IEnumerable<ProspectDataSearchCriteria> prospectDataSearchCriteria = await prospectDBContext.ProspectDataSearchCriterias.Where(p=>p.BingSearchUpdates == true).ToListAsync<ProspectDataSearchCriteria>();
+            IEnumerable<ProspectSearchCriteria> prospectSearchCriteriaList = Mapper.Map<IEnumerable<ProspectDataSearchCriteria>, IEnumerable<ProspectSearchCriteria>>(prospectDataSearchCriteria);
+            return prospectSearchCriteriaList;
+        }        
+
+        public async Task<bool> CreateProspectDataAsync(ProspectSummaryData prospectSummaryData)
         {
             try
             {
-                ProspectData prospectData = Mapper.Map<T, ProspectData>(data);
+                ProspectData prospectData = Mapper.Map<ProspectSummaryData, ProspectData>(prospectSummaryData);
                 prospectDBContext.ProspectDatas.Add(prospectData);
                 int result = await prospectDBContext.SaveChangesAsync();
                 return result < 1 ? false : true;

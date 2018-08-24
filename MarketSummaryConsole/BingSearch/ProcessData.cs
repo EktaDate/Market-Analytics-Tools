@@ -12,9 +12,8 @@ namespace MarketSummaryConsole
     {        
         public async Task ProcessBingSearchData()
         {                       
-            IDataAccess dataAccess = DataAccess.GetInstance();
-            Expression<Func<ProspectSearchCriteria, bool>> predicate = (p => p.BingSearchUpdates == true);                                                                               
-            IEnumerable<ProspectSearchCriteria> searchCriteriaList = await dataAccess.GetProspectSearchCriteriaAsync(predicate);
+            IDataAccess dataAccess = DataAccess.GetInstance();            
+            IEnumerable<ProspectSearchCriteria> searchCriteriaList = await dataAccess.GetProspectSearchCriteriaAsync();
 
             foreach (ProspectSearchCriteria searchCriteria in searchCriteriaList)
             {
