@@ -5,6 +5,10 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Linq;
 using System.Linq.Expressions;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
+using System.IO;
+using System.Configuration;
 
 namespace MarketSummaryConsole
 {
@@ -22,7 +26,45 @@ namespace MarketSummaryConsole
                 InsertBingDataAsync(searchResult.jsonResult, searchCriteria.ProspectName, searchCriteria.SearchString).Wait();                
             }                      
         }
-        
+
+        public async Task ProcessEmailData(string fileName)
+        {
+            ProspectSummaryData prospectSummaryData = new ProspectSummaryData
+            {
+                ProspectName = "",
+                SearchResult = readBlobData(fileName),
+                SearchString = "",
+                EmailUpdates= true,
+                DataProcessedDate = null
+            };
+            IDataAccess dataAccess = DataAccess.GetInstance();
+            await dataAccess.InsertProspectData(prospectSummaryData);
+        }
+
+        private string readBlobData(string filename)
+        {
+            try
+            {                
+                CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["tableStorageConnection"]);                
+                CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();                
+                CloudBlobContainer container = blobClient.GetContainerReference("emailbody");                
+                CloudBlockBlob blockBlob2 = container.GetBlockBlobReference(filename);
+
+                string text = string.Empty;
+                using (var memoryStream = new MemoryStream())
+                {
+                    blockBlob2.DownloadToStream(memoryStream);
+                    text = System.Text.Encoding.UTF8.GetString(memoryStream.ToArray());
+                }
+
+                return text;
+            }
+            catch
+            {
+                return string.Empty;
+            }
+
+        }
         private async Task InsertBingDataAsync(string bingSearchJsonResult,string prospectName, string searchString)
         {
           

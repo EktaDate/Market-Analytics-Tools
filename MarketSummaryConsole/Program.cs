@@ -23,10 +23,15 @@ namespace MarketSummaryConsole
             //processdata.ProcessBingSearchData().Wait();
             if (args != null && args.Length > 0)
             {
-                if (Convert.ToString(args[0]).ToUpper() == "BINGSEARCH")
+                string type = Convert.ToString(args[0]).ToUpper();
+                if (type == "BINGSEARCH")
                 {
                     processdata.ProcessBingSearchData().Wait();
                 }
+                else
+                {
+                    processdata.ProcessEmailData(Convert.ToString(args[0])).Wait();
+                }                                
             }
             Console.Write("\nPress Enter to exit ");
             Console.ReadLine();
